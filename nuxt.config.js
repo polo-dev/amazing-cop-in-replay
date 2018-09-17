@@ -46,7 +46,7 @@ module.exports = {
   },
   modules: [
     'bootstrap-vue/nuxt',
-
+    'cookie-universal-nuxt',
     // Or if you have custom bootstrap CSS...
     ['bootstrap-vue/nuxt', { css: true }],
   ]

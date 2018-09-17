@@ -3,7 +3,7 @@
       <app-head/>
       <b-container fluid>
          <b-row>
-            <b-col>
+            <b-col v-if="!getAccessToken()">
             <div class="loggin">
                <b-card title="Loggin"
                         img-src="http://images6.fanpop.com/image/photos/40300000/Spotify-spotify-40342607-3840-2160.jpg"
@@ -20,6 +20,9 @@
                </b-card>
             </div>
             </b-col>
+             <b-col v-if="getAccessToken()">
+               <p>trololol</p>
+             </b-col>
          </b-row>
       </b-container>
    </div>
@@ -31,6 +34,12 @@ import AppHead from '~/components/Head.vue'
 export default {
   components: {
      AppHead
+  },
+  methods: {
+    getAccessToken: function () {
+      let access_token = this.$cookies.get('access_token')
+      return (access_token) ? access_token : false
+    },
   }
 }
 </script>
