@@ -15,13 +15,14 @@
                   <p class="card-text">
                   Pour importer une playlist à ton compte, il te suffit de te logger à l'api Spotify en cliquant sur ce bouton!
                   </p>
-                  <!-- <b-button v-on:click="loggIn" variant="primary">Allons-y!</b-button> -->
+                  <b-button v-on:click="loggIn" variant="primary">Allons-y!</b-button>
                   <b-button variant="primary" href="/api/login">Allons-y!</b-button>
                </b-card>
             </div>
             </b-col>
              <b-col v-if="getAccessToken()">
                <p>trololol</p>
+               <b-button v-on:click="getPlaylists()" variant="primary">Test playlists</b-button>
              </b-col>
          </b-row>
       </b-container>
@@ -30,6 +31,7 @@
 
 <script>
 import AppHead from '~/components/Head.vue'
+import axios from 'axios'
 
 export default {
   components: {
@@ -40,6 +42,22 @@ export default {
       let access_token = this.$cookies.get('access_token')
       return (access_token) ? access_token : false
     },
+    getPlaylists: function () {
+      let access_token = this.getAccessToken()
+      let limit = 10
+      let offset = 0
+      let method = 'playlists'
+      axios
+        .get('/api/get?access_token=' + access_token + '&method=' + method + '&limit=' + limit + '&offset=' + offset)
+        .then(response => {
+            return response.data
+        })
+        .catch(error => {
+          console.log(error)
+          //todo
+        })
+        .finally()
+    }
   }
 }
 </script>

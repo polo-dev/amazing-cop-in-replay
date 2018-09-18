@@ -14,6 +14,43 @@ var querystring = require('querystring');
 var client_id = process.env.client_id; // Your client id
 var client_secret = process.env.client_secret; // Your secret
 var redirect_uri = process.env.redirect_uri; // Your redirect uri
+var serviceSpotify = require('./service/service.js');
+const baseUrl = 'https://api.spotify.com/';
+
+
+router.get('/get', function(req, res) {
+  var access_token = req.query.access_token;
+  var method = req.query.method;
+  var limit = (req.query.limit) ? req.query.limit : null;
+  var type = (req.query.type) ? req.query.type : null;
+  var offset = (req.query.offset) ? req.query.offset : null;
+
+  if(!access_token) {
+    res.status(500).send('Hey we need an access_token Dev!');
+  }
+  if(!method) {
+    res.status(500).send('Hey what\'s the name of the method dude ?');
+  }
+
+  let spotify = new serviceSpotify(access_token, method, limit, type, offset)
+
+  var authOptions = {
+    url: baseUrl + spotify.getUrl(),
+    headers: { 'Authorization': 'Bearer ' + access_token },
+    json: true
+  };
+
+  request.get(authOptions, function(error, response, body) {
+    console.log(response.statusCode);
+    if (!error && response.statusCode === 200) {
+      console.log(body)
+      res.send({
+        items: body
+      });
+    }
+
+  });
+});
 
 /**
  * Generates a random string containing numbers and letters
@@ -162,5 +199,6 @@ router.get('/current_music', function(req, res) {
 
   });
 });
+
 
 module.exports = router;
