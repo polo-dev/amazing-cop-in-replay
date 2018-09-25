@@ -1,3 +1,5 @@
+const webpack = require('webpack')
+
 module.exports = {
   /*
   ** Headers of the page
@@ -12,6 +14,9 @@ module.exports = {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
+  },
+  router: {
+    middleware: 'check_auth'
   },
   /*
   ** Customize the progress bar color
@@ -38,7 +43,14 @@ module.exports = {
       'axios',
       'lodash'
       //'vue-notifications'
-    ]
+    ],
+    plugins: [
+      new webpack.ProvidePlugin({
+        '$': 'jquery',
+        '_': 'lodash'
+        // ...etc.
+      })
+    ],
   },
   env: {
     url: 'http://localhost:3000',

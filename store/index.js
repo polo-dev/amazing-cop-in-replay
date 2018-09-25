@@ -1,16 +1,20 @@
-import Vuex from 'vuex'
+export const state = () => {
+  return {
+  auth: false
+  }
+}
 
-const createStore = () => {
-   return new Vuex.Store({
-     state: {
-       counter: 0
-     },
-     mutations: {
-       increment (state) {
-         state.counter++
-       }
-     }
-   })
- }
- 
- export default createStore
+export const mutations = {
+  SET_AUTH (state, auth) {
+    state.auth = auth || false
+  }
+}
+
+export const getters = {
+  isAuthenticated (state) {
+    return state.auth
+  },
+  loggedUser (state) {
+    return state.auth
+  }
+}

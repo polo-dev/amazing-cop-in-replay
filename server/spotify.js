@@ -18,6 +18,25 @@ var serviceSpotify = require('./service/service.js');
 const baseUrl = 'https://api.spotify.com/';
 
 
+router.get('/check_auth', function (req,res) {
+  let access_token = req.query.access_token;
+  var authOptions = {
+    url: baseUrl + 'v1/me',
+    headers: { 'Authorization': 'Bearer ' + access_token },
+    json: true
+  };
+
+  // use the access token to access the Spotify Web API
+  request.get(authOptions, function(error, response, body) {
+    console.log(response.statusCode)
+    if (response.statusCode === 200) {
+      res.send({auth: true})
+    } else {
+      res.send({auth: false})
+    }
+  });
+}) 
+
 router.get('/get', function(req, res) {
   var access_token = req.query.access_token;
   var method = req.query.method;
@@ -48,7 +67,10 @@ router.get('/get', function(req, res) {
         items: body
       });
     }
-
+    if (response.statusCode === 401) {
+      res.clearCookie('access_token');
+      res.redirect('login');
+    }
   });
 });
 
@@ -140,11 +162,7 @@ router.get('/callback', function(req, res) {
 
         // we can also pass the token to the browser to make requests from there
         res.cookie('access_token', access_token);
-        res.redirect('/#' +
-          querystring.stringify({
-            access_token: access_token,
-            refresh_token: refresh_token
-          }));
+        res.redirect('/#');
       } else {
         res.redirect('/#' +
           querystring.stringify({
