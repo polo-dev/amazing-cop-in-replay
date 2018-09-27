@@ -1,20 +1,20 @@
 export const state = () => {
   return {
-  auth: false
+    access_token: false
   }
 }
 
 export const mutations = {
-  SET_AUTH (state, auth) {
-    state.auth = auth || false
+  SET_TOKEN (state, access_token) {
+    state.access_token = access_token || false
   }
 }
 
 export const getters = {
   isAuthenticated (state) {
-    return state.auth
+    return !!state.access_token
   },
   loggedUser (state) {
-    return state.auth
+    return state.access_token
   }
 }
