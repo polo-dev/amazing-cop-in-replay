@@ -14,18 +14,25 @@ class serviceSpotify {
       this.offset = offset
    }
 
-   getUrl(method = null) {
-      if(!method) {
-         method = this.method
-      }
+   getUrl(params = []) {
       let url = '';
-      switch (method) {
-         case 'playlists':
-            url = 'v1/me/playlists?' + querystring.stringify({
-               limit: this.limit,
-               offset: this.offset
-            })
-            break
+      switch (this.method) {
+            case 'playlists':
+                  url = 'v1/me/playlists?' + querystring.stringify({
+                        limit: this.limit,
+                        offset: this.offset
+                  })
+                  break
+            case 'check_auth':
+                  url = 'v1/me'
+                  break
+            case 'getTracksPlaylist':
+                  console.log(params[0])
+                  url = 'v1/playlists/' + params[0] + '/tracks?' + querystring.stringify({
+                        limit: this.limit,
+                        offset: this.offset
+                  })
+                  break
          default:
             url = 'v1/me/player/currently-playing'
             break

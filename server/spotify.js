@@ -17,32 +17,13 @@ var redirect_uri = process.env.redirect_uri; // Your redirect uri
 var serviceSpotify = require('./service/service.js');
 const baseUrl = 'https://api.spotify.com/';
 
-
-router.get('/check_auth', function (req,res) {
-  let access_token = req.query.access_token;
-  var authOptions = {
-    url: baseUrl + 'v1/me',
-    headers: { 'Authorization': 'Bearer ' + access_token },
-    json: true
-  };
-
-  // use the access token to access the Spotify Web API
-  request.get(authOptions, function(error, response, body) {
-    console.log(response.statusCode)
-    if (response.statusCode === 200) {
-      res.send({auth: true})
-    } else {
-      res.send({auth: false})
-    }
-  });
-}) 
-
 router.get('/get', function(req, res) {
   var access_token = req.query.access_token;
   var method = req.query.method;
   var limit = (req.query.limit) ? req.query.limit : null;
   var type = (req.query.type) ? req.query.type : null;
   var offset = (req.query.offset) ? req.query.offset : null;
+  var params = (req.query.params) ? req.query.params : null;
 
   if(!access_token) {
     res.status(500).send('Hey we need an access_token Dev!');
@@ -54,7 +35,7 @@ router.get('/get', function(req, res) {
   let spotify = new serviceSpotify(access_token, method, limit, type, offset)
 
   var authOptions = {
-    url: baseUrl + spotify.getUrl(),
+    url: baseUrl + spotify.getUrl(params),
     headers: { 'Authorization': 'Bearer ' + access_token },
     json: true
   };

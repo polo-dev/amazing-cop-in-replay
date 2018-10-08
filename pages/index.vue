@@ -45,11 +45,21 @@ export default {
   },
   async fetch ({ store, params }) {
     if (store.state.access_token) {
+      let method = 'check_auth'
       let { data } = await axios
-        .get('http://localhost:3000/api/check_auth?access_token=' + store.state.access_token)
+        .get('http://localhost:3000/api/get?access_token=' + store.state.access_token + '&method=' + method)
+        .catch(error => {
+          console.log(error)
+        })
+        .finally()
+        console.log(data)
         if (!data) {
           store.state.access_token = false
+          store.commit('SET_TOKEN', false)
         }
+    } else {
+      store.state.access_token = false
+      store.commit('SET_TOKEN', false)
     }
     
   },
