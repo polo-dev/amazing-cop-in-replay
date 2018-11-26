@@ -4,7 +4,7 @@
         <b-col>
           <b-img-lazy width="300" height="300" thumbnail fluid v-bind:src="playlist.images[0].url" alt="Thumbnail" />
           <p v-html="computedClass(index)"></p>
-          <b-list-group v-if="trakcs[playlist.id] == true">
+          <b-list-group v-if="trakcs[playlist.id]">
             <b-list-group-item v-for="(track) in trakcs[playlist.id]" :key="track.track.id">
               {{ track.track.name }}
             </b-list-group-item>
@@ -12,6 +12,7 @@
         </b-col>
          <div v-if="computedClass(index) === 0" class="w-100"></div>
       </div>
+      <p v-if="trakcs">test</p>
    </b-row>
 </template>
 
@@ -28,7 +29,8 @@ export default {
       playlists: null,
       limit: 50,
       offset: 0,
-      trakcs: []
+      trakcs: [],
+      tracksCache: []
     }
   },
   mounted () {
@@ -44,6 +46,9 @@ export default {
         })
         .finally()
   },
+  watch: {
+    
+  },
   methods: {
     computedClass(index) {
       if ((index + 1) % 3 === 0) { 
@@ -53,19 +58,33 @@ export default {
       }
       return index;
     },
-    getPlaylistTrack(playlist_id) {
-      let access_token = this.$store.state.access_token
-      let method = 'getTracksPlaylist'
-      axios
-        .get('/api/get?access_token=' + access_token + '&method=' + method + '&limit=' + this.limit + '&offset=' + this.offset + '&params[]=' + playlist_id)
-        .then(response => {
-          this.trakcs[playlist_id] = response.data.items.items
-          console.log(this.trakcs[playlist_id])
-        })
-        .catch(error => {
-          console.log(error)
-        })
-        .finally()
+    async getPlaylistTrack(playlist_id) {
+      console.log(this.tracksCache[playlist_id])
+      if (this.tracksCache[playlist_id]) {
+        if (this.trakcs[playlist_id]) {
+          this.$delete(this.trakcs, playlist_id)
+          console.log(this.trakcs)
+        } else {
+          this.$set(this.trakcs,playlist_id, this.tracksCache[playlist_id])
+        }
+        
+      } else {
+        let access_token = this.$store.state.access_token
+        let method = 'getTracksPlaylist'
+        let data = await axios
+            .get('/api/get?access_token=' + access_token + '&method=' + method + '&limit=' + this.limit + '&offset=' + this.offset + '&params[]=' + playlist_id)
+            .then(response => {
+              return response.data.items.items
+            })
+            .catch(error => {
+              console.log(error)
+            })
+            .finally()
+
+        this.$set(this.trakcs, playlist_id, data)
+        this.$set(this.tracksCache, playlist_id, data)
+        console.log(this.trakcs)
+      }
     }
   }
 }

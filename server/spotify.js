@@ -43,7 +43,6 @@ router.get('/get', function(req, res) {
   request.get(authOptions, function(error, response, body) {
     console.log(response.statusCode);
     if (!error && response.statusCode === 200) {
-      console.log(body)
       res.send({
         items: body
       });
