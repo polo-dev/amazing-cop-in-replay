@@ -27,7 +27,6 @@ class serviceSpotify {
                   url = 'v1/me'
                   break
             case 'getTracksPlaylist':
-                  console.log(params[0])
                   url = 'v1/playlists/' + params[0] + '/tracks?' + querystring.stringify({
                         limit: this.limit,
                         offset: this.offset

@@ -14,7 +14,7 @@ var querystring = require('querystring');
 var client_id = process.env.client_id; // Your client id
 var client_secret = process.env.client_secret; // Your secret
 var redirect_uri = process.env.redirect_uri; // Your redirect uri
-var serviceSpotify = require('./service/service.js');
+var serviceSpotify = require('./service/serviceSpotify.js');
 const baseUrl = 'https://api.spotify.com/';
 
 router.get('/get', function(req, res) {

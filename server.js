@@ -15,8 +15,9 @@ var app = express();
     next();
 });
 const apiSpotify = require('./server/spotify.js');
+const apiYoutube = require('./server/youtube.js');
 
-app.use('/api', apiSpotify);
+app.use('/api', [apiSpotify, apiYoutube]);
  /* eslint-disable no-console */
 
 
