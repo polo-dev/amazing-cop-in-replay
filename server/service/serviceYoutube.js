@@ -7,15 +7,8 @@ class serviceYoutube {
 
     }
 
-    searchListByKeyword(auth, requestData, service) {
-        var parameters = this.removeEmptyParameters(requestData['params']);
-        service.search.list(parameters, function (err, response) {
-            if (err) {
-                console.log('The API returned an error: ' + err);
-                return;
-            }
-            console.log(response);
-        });
+    searchListByKeyword(requestData, service) {
+        
     }
 
     removeEmptyParameters(params) {

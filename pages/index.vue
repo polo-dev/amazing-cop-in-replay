@@ -27,6 +27,9 @@
               <b-col>
               <playlist/>
             </b-col>
+            <b-col>
+              <button v-on:click="test()">Button</button>
+            </b-col>
           </b-row>
         </div>
       </b-container>
@@ -70,6 +73,19 @@ export default {
       let access_token = this.$cookies.get('access_token')
       return (access_token) ? access_token : false
     },
+    test: async function () {
+      let data = await axios
+            .get('/api/youtube/search?params=south+beach+vicetone')
+            .then(response => {
+              return response.data
+            })
+            .catch(error => {
+              console.log(error)
+            })
+            .finally()
+
+        console.log(data)
+    }
   }
 }
 </script>
