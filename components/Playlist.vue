@@ -4,15 +4,15 @@
         <b-col>
           <b-img-lazy width="300" height="300" thumbnail fluid v-bind:src="playlist.images[0].url" alt="Thumbnail" />
           <p v-html="computedClass(index)"></p>
-          <b-list-group v-if="trakcs[playlist.id]">
-            <b-list-group-item v-for="(track) in trakcs[playlist.id]" :key="track.track.id">
+          <b-list-group v-if="display(playlist.id)">
+            <b-list-group-item v-for="(track) in tracks[playlist.id].content" :key="track.track.id">
               {{ track.track.name }}
             </b-list-group-item>
           </b-list-group>
         </b-col>
          <div v-if="computedClass(index) === 0" class="w-100"></div>
       </div>
-      <p v-if="trakcs">test</p>
+      <p v-if="tracks">test</p>
    </b-row>
 </template>
 
@@ -29,8 +29,7 @@ export default {
       playlists: null,
       limit: 50,
       offset: 0,
-      trakcs: [],
-      tracksCache: []
+      tracks: [],
     }
   },
   mounted () {
@@ -50,6 +49,12 @@ export default {
     
   },
   methods: {
+    display(playlist_id) {
+      if (!this.tracks || !this.tracks[playlist_id]) {
+        return false
+      }
+      return this.tracks[playlist_id]['display']
+    },
     computedClass(index) {
       if ((index + 1) % 3 === 0) { 
          index = 0 
@@ -59,15 +64,9 @@ export default {
       return index;
     },
     async getPlaylistTrack(playlist_id) {
-      console.log(this.tracksCache[playlist_id])
-      if (this.tracksCache[playlist_id]) {
-        if (this.trakcs[playlist_id]) {
-          this.$delete(this.trakcs, playlist_id)
-          console.log(this.trakcs)
-        } else {
-          this.$set(this.trakcs,playlist_id, this.tracksCache[playlist_id])
-        }
-        
+       if (this.tracks && this.tracks[playlist_id]) {
+        let rep = (this.tracks[playlist_id]['display']) ? false : true
+        this.$set(this.tracks[playlist_id],'display', rep)
       } else {
         let access_token = this.$store.state.access_token
         let method = 'getTracksPlaylist'
@@ -81,9 +80,12 @@ export default {
             })
             .finally()
 
-        this.$set(this.trakcs, playlist_id, data)
-        this.$set(this.tracksCache, playlist_id, data)
-        console.log(this.trakcs)
+        let dateSet = {
+          content: data,
+          display: true
+        }
+        this.$set(this.tracks, playlist_id, dateSet)
+        console.log(this.tracks)
       }
     }
   }

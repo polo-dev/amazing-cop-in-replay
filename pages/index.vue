@@ -24,11 +24,19 @@
         </div>
         <div v-if="$store.state.access_token">
           <b-row>
-              <b-col>
-              <playlist/>
-            </b-col>
             <b-col>
               <button v-on:click="test()">Button</button>
+              <p>
+                <input v-model="search">
+              </p>
+              <p>
+                {{ answser }}
+              </p>
+            </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+              <playlist/>
             </b-col>
           </b-row>
         </div>
@@ -40,11 +48,26 @@
 import AppHead from '~/components/Head.vue'
 import Playlist from '~/components/Playlist.vue'
 import axios from 'axios'
+import _ from 'lodash'
 
 export default {
   components: {
      AppHead,
      Playlist
+  },
+  data () {
+    return {
+      search: '',
+      answser: ''
+    }
+  },
+  watch: {
+    search: function (newQuestion, oldQuestion) {
+      this.debouncedGetAnswer()
+    }
+  },
+  created: function () {
+    this.debouncedGetAnswer = _.debounce(this.getSearch, 500)
   },
   async fetch ({ store, params }) {
     if (store.state.access_token) {
@@ -65,9 +88,6 @@ export default {
     }
     
   },
-  mounted () {
-    
-  },
   methods: {
     getAccessToken: function () {
       let access_token = this.$cookies.get('access_token')
@@ -85,6 +105,21 @@ export default {
             .finally()
 
         console.log(data)
+    },
+    getSearch: async function () {
+      let s = this.search.split(' ').join('+');
+      let data = await axios
+            .get('/api/youtube/search?params=' + s)
+            .then(response => {
+              return response.data
+            })
+            .catch(error => {
+              console.log(error)
+            })
+            .finally()
+
+        console.log(data)
+        this.answser = 'https://youtube.com/watch?v=' + data.items.items[0].id.videoId
     }
   }
 }
