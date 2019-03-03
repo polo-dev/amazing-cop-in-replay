@@ -21,7 +21,7 @@ module.exports = {
   /*
   ** Customize the progress bar color
   */
-  loading: { color: '#3B8070' },
+  loading: '~/components/Loading.vue',
   /*
   ** Build configuration
   */
@@ -41,15 +41,16 @@ module.exports = {
     },
     vendor: [
       'axios',
-      'lodash'
+      'lodash',
       //'vue-notifications'
     ],
     plugins: [
       new webpack.ProvidePlugin({
         '$': 'jquery',
-        '_': 'lodash'
+        '_': 'lodash',
+        'anime': '~/plugins/vue-animejs'
         // ...etc.
-      })
+      }),
     ],
   },
   env: {
@@ -57,7 +58,6 @@ module.exports = {
     port: 3000
   },
   modules: [
-    'bootstrap-vue/nuxt',
     'cookie-universal-nuxt',
     // Or if you have custom bootstrap CSS...
     ['bootstrap-vue/nuxt', { css: true }],

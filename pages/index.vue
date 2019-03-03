@@ -24,6 +24,9 @@
         </div>
         <div v-if="$store.state.access_token">
           <b-row>
+            <a href="/api/youtube/login">test</a>
+          </b-row>
+          <b-row>
             <b-col>
               <button v-on:click="test()">Button</button>
               <p>
@@ -119,6 +122,7 @@ export default {
             .finally()
 
         console.log(data)
+        console.log(data.items.items[0])
         this.answser = 'https://youtube.com/watch?v=' + data.items.items[0].id.videoId
     }
   }
