@@ -32,9 +32,9 @@
               <p>
                 <input v-model="search">
               </p>
-              <p>
+              <a v-bind:href="answser">
                 {{ answser }}
-              </p>
+              </a>
             </b-col>
           </b-row>
           <b-row>
@@ -121,6 +121,10 @@ export default {
             })
             .finally()
 
+        if (data.error && data.redirectUrl) {
+          this.answser = data.redirectUrl
+          return
+        }
         console.log(data)
         console.log(data.items.items[0])
         this.answser = 'https://youtube.com/watch?v=' + data.items.items[0].id.videoId
