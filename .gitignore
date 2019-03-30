@@ -1,6 +1,6 @@
+./static/client_secret*
 .env
 /node_modules
 .nuxt
 .vscode
 .test
-/static
