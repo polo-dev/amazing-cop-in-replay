@@ -86,11 +86,16 @@ router.post('/youtube/convert/spotify', async function (req, res) {
 
     let serviceY = new serviceYoutube();
     let keywords = serviceY.getAllKeywordFromSpotify(tracks)
+    console.log(keywords);
     let results = await asyncForEachSearch(keywords, token, res);
     let data = [];
     results.forEach(r => {
-        console.log(r.id)
-        data.push(r.id.videoId)
+        if (r && typeof r.id !== 'undefined') {
+            console.log(r.id)
+            data.push(r.id.videoId)
+        } else {
+            console.log('error : ', r)
+        }
     })
     console.log('les datas :')
     console.log(data);

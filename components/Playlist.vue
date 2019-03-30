@@ -104,11 +104,21 @@ export default {
     },
     async convertToYoutube(playlist_id) {
       console.log(playlist_id)
-      console.log(this.tracks[playlist_id])
+      let content = this.tracks[playlist_id].content
+      let tracks = []
+      for (let index = 0; index < content.length; index++) {
+        let track = content[index].track
+        tracks.push({
+          name: track.name,
+          album: track.album.name,
+          artists: track.artists
+        });      
+      }
+      console.log(tracks);
       this.start()
       let data = await axios
             .post('/api/youtube/convert/spotify', {
-              tracks: this.tracks[playlist_id].content
+              tracks: tracks
             })
             .then(response => {
               return response.data
