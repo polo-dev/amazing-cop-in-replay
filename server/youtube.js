@@ -73,6 +73,49 @@ router.get('/youtube/search', async function (req, res) {
         'type': 'video'}}, searchListByKeyword, res);
 })
 
+router.post('/youtube/convert/spotify', async function (req, res) {
+    var tracks = (req.body.tracks) ? req.body.tracks : null
+    let token = (req.cookies.tokens_google) ? req.cookies.tokens_google : null
+
+    if (!tracks) {
+        res.redirect('/#' +
+            querystring.stringify({
+            error: 'error missing tracks'
+        }));
+    }
+
+    let serviceY = new serviceYoutube();
+    let keywords = serviceY.getAllKeywordFromSpotify(tracks)
+    let results = await asyncForEachSearch(keywords, token, res);
+    let data = [];
+    results.forEach(r => {
+        console.log(r.id)
+        data.push(r.id.videoId)
+    })
+    console.log('les datas :')
+    console.log(data);
+    
+    res.json({
+        items: data
+    })
+    
+})
+
+async function asyncForEachSearch(keywords, token, res) {
+    let results = []
+    for (let index = 0; index < keywords.length; index++) {
+        let result = await authorize(token, {'params': {'maxResults': '1',
+        'part': 'snippet',
+        'q': keywords[index],
+        'type': 'video'}}, await searchListByKeywordV2, res)
+
+        results.push(result[0]);
+        if (index === keywords.length -1) {
+            return results
+        }
+    }
+  }
+  
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
  * given callback function.
@@ -81,7 +124,7 @@ router.get('/youtube/search', async function (req, res) {
  * @param {function} callback The callback to call with the authorized client.
  */
 async function authorize(token, requestData, callback, res) {
-    console.log(token);
+    // console.log(token);
     if (!token || Date.now() > token.expiry_date) {
         console.log('token expiry or token missing')
         res.send({
@@ -92,7 +135,7 @@ async function authorize(token, requestData, callback, res) {
     }
 
     oauth2Client.setCredentials(token);
-    callback(requestData, res);
+    return await callback(requestData, res);
 }
 
 async function getAuthUrl() {
@@ -102,24 +145,17 @@ async function getAuthUrl() {
     });
     return authUrl
 }
-/**
- * Remove parameters that do not have values.
- *
- * @param {Object} params A list of key-value pairs representing request
- *                        parameters and their values.
- * @return {Object} The params object minus parameters with no values set.
- */
-function removeEmptyParameters(params) {
-  for (var p in params) {
-    if (!params[p] || params[p] == 'undefined') {
-      delete params[p];
-    }
-  }
-  return params;
+
+async function searchListByKeywordV2(requestData) {
+    let serviceY = new serviceYoutube()
+    var parameters = serviceY.removeEmptyParameters(requestData['params']);
+    let result = await youtube.search.list(parameters);
+    return result.data.items;
 }
 
 async function searchListByKeyword(requestData, res) {
-    var parameters = removeEmptyParameters(requestData['params']);
+    let serviceY = new serviceYoutube()
+    var parameters = serviceY.removeEmptyParameters(requestData['params']);
     youtube.search.list(parameters, function(err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
@@ -135,6 +171,6 @@ async function searchListByKeyword(requestData, res) {
             items: response.data
         })
     });
-  }
+}
 
 module.exports = router;
