@@ -7,10 +7,6 @@ class serviceYoutube {
 
     }
 
-    searchListByKeyword(requestData, service) {
-        
-    }
-
     /**
      * Remove parameters that do not have values.
      *
@@ -27,16 +23,22 @@ class serviceYoutube {
         return params;
     }
 
+    /**
+     * 
+     * @param {Object} tracks List of tracks with track name, track album name
+     *                          and artists
+     * @return {Array} list of keywords to search on youtube
+     */
     getAllKeywordFromSpotify(tracks) {
         let keywords = [];
         tracks.forEach(track => {
-            let myKeyword = track.name + ' ' + track.album;    
+            let myKeyword = track.name + ' ' + track.album;
             if (typeof track.artists !== 'undefined') {
                 track.artists.forEach(artist => {
                     myKeyword += ' ' + artist.name
                 })
             }
-            keywords.push(myKeyword) 
+            keywords.push(myKeyword)
         });
         return keywords
     }

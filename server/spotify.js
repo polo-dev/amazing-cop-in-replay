@@ -16,42 +16,67 @@ var client_secret = process.env.client_secret; // Your secret
 var redirect_uri = process.env.redirect_uri; // Your redirect uri
 var serviceSpotify = require('./service/serviceSpotify.js');
 const baseUrl = 'https://api.spotify.com/';
+var rp = require('request-promise');
 
-router.get('/get', function(req, res) {
+router.get('/get', async function (req, res) {
   var access_token = req.query.access_token;
   var method = req.query.method;
-  var limit = (req.query.limit) ? req.query.limit : null;
+  var limit = (req.query.limit) ? parseInt(req.query.limit) : null;
   var type = (req.query.type) ? req.query.type : null;
-  var offset = (req.query.offset) ? req.query.offset : null;
+  var offset = (req.query.offset) ? parseInt(req.query.offset) : null;
   var params = (req.query.params) ? req.query.params : null;
+  var total = (req.query.total) ? parseInt(req.query.total) : null;
 
-  if(!access_token) {
+  if (!access_token) {
     res.status(500).send('Hey we need an access_token Dev!');
   }
-  if(!method) {
+  if (!method) {
     res.status(500).send('Hey what\'s the name of the method dude ?');
   }
-
+  
   let spotify = new serviceSpotify(access_token, method, limit, type, offset)
+  var allAuthOptions = [];
 
-  var authOptions = {
-    url: baseUrl + spotify.getUrl(params),
-    headers: { 'Authorization': 'Bearer ' + access_token },
-    json: true
-  };
+  if (total > limit) {
+    let offset = Math.ceil(total / limit)
+    for (i = 0; offset > i; i++) {
+      let authOptions = {
+        url: baseUrl + spotify.getUrl(params),
+        headers: { 'Authorization': 'Bearer ' + access_token },
+        json: true
+      };
+      allAuthOptions[i] = authOptions
+      spotify.incrementOffset()
+    }
+  } else {
+    let authOptions = {
+      url: baseUrl + spotify.getUrl(params),
+      headers: { 'Authorization': 'Bearer ' + access_token },
+      json: true
+    };
+    allAuthOptions.push(authOptions)
+  }
 
-  request.get(authOptions, function(error, response, body) {
-    console.log(response.statusCode);
-    if (!error && response.statusCode === 200) {
+  const promises = allAuthOptions.map(options => rp(options));
+  Promise.all(promises).then((data) => {
+    console.log('test promises', data)
+    if (data.length === 1) {
       res.send({
-        items: body
-      });
+        items: data[0]
+      })  
+    } else {
+      res.send({
+        items: data
+      })
     }
-    if (response.statusCode === 401) {
-      res.clearCookie('access_token');
-      res.redirect('login');
-    }
-  });
+    
+  })
+    .catch(function (err) {
+      console.log(err)
+      res.clearCookie('access_token')
+      res.redirect('login')
+      // Crawling failed...
+    });
 });
 
 /**
@@ -59,7 +84,7 @@ router.get('/get', function(req, res) {
  * @param  {number} length The length of the string
  * @return {string} The generated string
  */
-var generateRandomString = function(length) {
+var generateRandomString = function (length) {
   var text = '';
   var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -73,11 +98,11 @@ var stateKey = 'spotify_auth_state';
 
 // middleware that is specific to this router
 router.use(function timeLog(req, res, next) {
-   console.log('Time: ', Date.now());
-   next();
- });
+  console.log('Time: ', Date.now());
+  next();
+});
 
-router.get('/login', function(req, res) {
+router.get('/login', function (req, res) {
 
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
@@ -94,7 +119,7 @@ router.get('/login', function(req, res) {
     }));
 });
 
-router.get('/callback', function(req, res) {
+router.get('/callback', function (req, res) {
 
   // your application requests refresh and access tokens
   // after checking the state parameter
@@ -123,12 +148,12 @@ router.get('/callback', function(req, res) {
       json: true
     };
 
-    request.post(authOptions, function(error, response, body) {
+    request.post(authOptions, function (error, response, body) {
       if (!error && response.statusCode === 200) {
 
         var access_token = body.access_token,
-            refresh_token = body.refresh_token;
-
+          refresh_token = body.refresh_token;
+        console.log(response, body)
         // we can also pass the token to the browser to make requests from there
         res.cookie('access_token', access_token);
         res.redirect('/#');
@@ -142,7 +167,7 @@ router.get('/callback', function(req, res) {
   }
 });
 
-router.get('/refresh_token', function(req, res) {
+router.get('/refresh_token', function (req, res) {
 
   // requesting access token from refresh token
   var refresh_token = req.query.refresh_token;
@@ -156,7 +181,7 @@ router.get('/refresh_token', function(req, res) {
     json: true
   };
 
-  request.post(authOptions, function(error, response, body) {
+  request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var access_token = body.access_token;
       res.send({
@@ -166,7 +191,7 @@ router.get('/refresh_token', function(req, res) {
   });
 });
 
-router.get('/current_music', function(req, res) {
+router.get('/current_music', function (req, res) {
   var access_token = req.query.access_token;
   var authOptions = {
     url: 'https://api.spotify.com/v1/me/player/currently-playing',
@@ -175,10 +200,10 @@ router.get('/current_music', function(req, res) {
   };
   console.log(access_token);
 
-  request.get(authOptions, function(error, response, body) {
+  request.get(authOptions, function (error, response, body) {
     console.log(response.statusCode);
     if (!error && response.statusCode === 200) {
-      console.log(body.item.artists); 
+      console.log(body.item.artists);
       res.send({
         artists: body.item.artists
       });

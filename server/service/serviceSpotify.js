@@ -14,6 +14,15 @@ class serviceSpotify {
       this.offset = offset
    }
 
+   setOffset(offset) {
+         this.offset = offset
+   }
+
+   incrementOffset() {
+      this.offset += this.limit
+      return this.offset
+   }
+
    getUrl(params = []) {
       let url = '';
       switch (this.method) {
