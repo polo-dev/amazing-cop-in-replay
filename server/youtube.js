@@ -9,10 +9,7 @@ var client_id = process.env.CLIENT_ID_GOOGLE
 var redirect_url = process.env.URL_REDIRECT_GOOGLE
 let apiAuthUrl = '/api/youtube/login'
 
-var fs = require('fs');
-var readline = require('readline');
 const {google} = require('googleapis');
-var googleAuth = require('google-auth-library');
 
 const oauth2Client = new google.auth.OAuth2(
     client_id,
@@ -58,7 +55,6 @@ router.get('/youtube/callback', async (req, res) => {
         res.redirect('/#');
     }
 });
-
 
 router.get('/youtube/search', async function (req, res) {
     console.log(req.cookies.access_token)
@@ -114,7 +110,9 @@ async function asyncForEachSearch(keywords, token, res) {
         'q': keywords[index],
         'type': 'video'}}, await searchListByKeywordV2, res)
 
-        results.push(result[0]);
+        if (result)
+            results.push(result[0]);
+        
         if (index === keywords.length -1) {
             return results
         }
@@ -157,6 +155,19 @@ async function searchListByKeywordV2(requestData) {
     let result = await youtube.search.list(parameters);
     return result.data.items;
 }
+
+function playlistsInsert(auth, requestData) {
+    let serviceY = new serviceYoutube()
+    var parameters = serviceY.removeEmptyParameters(requestData['params'])
+    parameters['resource'] = createResource(requestData['properties']);
+    service.playlists.insert(parameters, function(err, response) {
+      if (err) {
+        console.log('The API returned an error: ' + err);
+        return;
+      }
+      console.log(response);
+    });
+  }
 
 async function searchListByKeyword(requestData, res) {
     let serviceY = new serviceYoutube()

@@ -3,12 +3,13 @@ var express = require('express'); // Express web server framework
 var cors = require('cors');
 var cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+
 require('dotenv').config();
 
 var app = express();
 
- app.use(express.static(__dirname + './assets'));
- app.use(cors())
+app.use(express.static(__dirname + './assets'));
+app.use(cors())
  .use(cookieParser())
  .use(bodyParser.json())
  .use(function(req, res, next) {

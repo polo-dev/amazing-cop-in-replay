@@ -26,6 +26,15 @@ module.exports = {
   ** Build configuration
   */
   build: {
+    devMiddleware: {
+      noInfo: true,
+      quiet: true,
+      reload: true,
+      entry: {
+        spotify: './service/spotify.js',
+        youtube: './service/youtube.js',
+      }
+    },
     /*
     ** Run ESLint on save
     */

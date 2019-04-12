@@ -26,7 +26,7 @@ router.get('/get', async function (req, res) {
   var offset = (req.query.offset) ? parseInt(req.query.offset) : null;
   var params = (req.query.params) ? req.query.params : null;
   var total = (req.query.total) ? parseInt(req.query.total) : null;
-
+  
   if (!access_token) {
     res.status(500).send('Hey we need an access_token Dev!');
   }
