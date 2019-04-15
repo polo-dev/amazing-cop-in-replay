@@ -27,13 +27,21 @@ module.exports = {
   */
   build: {
     devMiddleware: {
+      mode: 'development',
+      context: __dirname,
       noInfo: true,
       quiet: true,
       reload: true,
-      entry: {
-        spotify: './service/spotify.js',
-        youtube: './service/youtube.js',
-      }
+      entry: [
+        'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
+        './service/spotify.js',
+        './service/youtube.js',
+      ],
+      output: {
+        path: __dirname,
+        publicPath: '/',
+        filename: 'bundle.js'
+      },
     },
     /*
     ** Run ESLint on save
@@ -54,6 +62,8 @@ module.exports = {
       //'vue-notifications'
     ],
     plugins: [
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.NoEmitOnErrorsPlugin(),
       new webpack.ProvidePlugin({
         '$': 'jquery',
         '_': 'lodash',

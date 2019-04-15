@@ -26,14 +26,14 @@ router.get('/get', async function (req, res) {
   var offset = (req.query.offset) ? parseInt(req.query.offset) : null;
   var params = (req.query.params) ? req.query.params : null;
   var total = (req.query.total) ? parseInt(req.query.total) : null;
-  
+
   if (!access_token) {
     res.status(500).send('Hey we need an access_token Dev!');
   }
   if (!method) {
     res.status(500).send('Hey what\'s the name of the method dude ?');
   }
-  
+
   let spotify = new serviceSpotify(access_token, method, limit, type, offset)
   var allAuthOptions = [];
 
@@ -63,13 +63,13 @@ router.get('/get', async function (req, res) {
     if (data.length === 1) {
       res.send({
         items: data[0]
-      })  
+      })
     } else {
       res.send({
         items: data
       })
     }
-    
+
   })
     .catch(function (err) {
       console.log(err)
@@ -187,6 +187,11 @@ router.get('/refresh_token', function (req, res) {
       res.send({
         'access_token': access_token
       });
+    } else {
+      res.redirect('/#' +
+        querystring.stringify({
+          error: 'invalid_token'
+        }));
     }
   });
 });
@@ -207,6 +212,11 @@ router.get('/current_music', function (req, res) {
       res.send({
         artists: body.item.artists
       });
+    } else {
+      res.redirect('/#' +
+        querystring.stringify({
+          error: 'invalid_token'
+        }));
     }
 
   });

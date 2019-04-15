@@ -42,6 +42,49 @@ class serviceYoutube {
         });
         return keywords
     }
+
+    /**
+     * 
+     * @param {Array} params 
+     */
+    getDefaultInsertPlaylist(params) {
+        return {
+            "part": "snippet,status",
+            "resource": {
+                "snippet": {
+                    "title": params.name,
+                    "description": "Une playlist de qualitée.",
+                    "tags": [
+                        params.name
+                    ],
+                    "defaultLanguage": "fr"
+                },
+                "status": {
+                    "privacyStatus": params.isPublic ? "public" : "private"
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param {Array} params 
+     * @param {string} playlistId 
+     */
+    getDefaultInsertTracks(params, playlistId) {
+        return {
+            "part": "snippet",
+            "resource": {
+                "snippet": {
+                    "playlistId": playlistId,
+                    "resourceId": {
+                        "kind": params.kind,
+                        "videoId": params.videoId
+                    }
+                }
+            }
+        }
+    }
 }
 
 module.exports = serviceYoutube

@@ -2,7 +2,7 @@
    <div id="app">
       <app-head/>
       <b-container fluid>
-        <div v-if="!$store.state.access_token">
+        <div v-if="!checkStateAccesToken">
         <b-row>
             <b-col>
               <div class="loggin">
@@ -22,7 +22,7 @@
             </b-col>
         </b-row>
         </div>
-        <div v-if="$store.state.access_token">
+        <div v-else>
           <b-row>
             <a href="/api/youtube/login">test</a>
           </b-row>
@@ -62,6 +62,11 @@ export default {
     return {
       search: '',
       answser: ''
+    }
+  },
+  computed: {
+    checkStateAccesToken: function () {
+      return (this.$store.state && this.$store.state.access_token) ? true : false
     }
   },
   watch: {

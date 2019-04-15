@@ -21,7 +21,7 @@
         <p v-html="playlist.name"></p>
         <button
           v-if="display(playlist.id)"
-          v-on:click="convertToYoutube(playlist.id)"
+          v-on:click="convertToYoutube(playlist.id, index)"
         >Convertir en playlist youtube</button>
         <b-list-group v-if="display(playlist.id)">
           <b-list-group-item
@@ -144,7 +144,7 @@ export default {
         console.log(this.tracks);
       }
     },
-    async convertToYoutube(playlist_id) {
+    async convertToYoutube(playlist_id, index) {
       console.log(playlist_id);
       let content = this.tracks[playlist_id].content;
       let tracks = [];
@@ -160,22 +160,27 @@ export default {
       this.start();
       let data = await axios
         .post("/api/youtube/convert/spotify", {
-          tracks: tracks
+          tracks: tracks,
+          name: this.playlists[index].name,
+          public: this.playlists[index].public
         })
         .then(response => {
-          return response.data;
+          console.log('success convert : ', response)
+          return response.data
         })
         .catch(error => {
-          console.log(error);
+          console.log('error convert : ', error, error.response.data)
+          return error.response.data
         })
         .finally();
 
+      this.finish();
+
       if (data.error && data.redirectUrl) {
-        this.answser = data.redirectUrl;
+        window.location.href = data.redirectUrl
         return;
       }
 
-      this.finish();
     }
   }
 };

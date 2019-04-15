@@ -9,13 +9,13 @@ var client_id = process.env.CLIENT_ID_GOOGLE
 var redirect_url = process.env.URL_REDIRECT_GOOGLE
 let apiAuthUrl = '/api/youtube/login'
 
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 
 const oauth2Client = new google.auth.OAuth2(
     client_id,
     client_secret,
     redirect_url
-  );
+);
 
 
 const scopes = [
@@ -26,15 +26,15 @@ const scopes = [
 router.use(function timeLog(req, res, next) {
     console.log('Time: ', Date.now());
     next();
-  });
+});
 
-google.options({auth: oauth2Client});
+google.options({ auth: oauth2Client });
 
 const youtube = google.youtube({
     version: 'v3',
 });
 
-router.get('/youtube/login', async function(req, res) {    
+router.get('/youtube/login', async function (req, res) {
     res.redirect(await getAuthUrl());
 })
 
@@ -44,7 +44,7 @@ router.get('/youtube/callback', async (req, res) => {
     // after checking the state parameter
     try {
         console.log(req.query);
-        const {tokens} = await  oauth2Client.getToken(req.query.code)
+        const { tokens } = await oauth2Client.getToken(req.query.code)
         console.log(tokens);
         oauth2Client.setCredentials(tokens)
         res.cookie('tokens_google', tokens)
@@ -63,62 +63,101 @@ router.get('/youtube/search', async function (req, res) {
     var params = (req.query.params) ? req.query.params : null
     let token = (req.cookies.tokens_google) ? req.cookies.tokens_google : null
 
-    await authorize(token, {'params': {'maxResults': '10',
-        'part': 'snippet',
-        'q': params,
-        'type': 'video'}}, searchListByKeyword, res);
+    await authorize(token, {
+        'params': {
+            'maxResults': '10',
+            'part': 'snippet',
+            'q': params,
+            'type': 'video'
+        }
+    }, searchListByKeyword, res);
 })
 
 router.post('/youtube/convert/spotify', async function (req, res) {
     var tracks = (req.body.tracks) ? req.body.tracks : null
+    var name = (req.body.name) ? req.body.name : null
+    var isPublic = (req.body.public) ? req.body.public : null
     let token = (req.cookies.tokens_google) ? req.cookies.tokens_google : null
 
     if (!tracks) {
         res.redirect('/#' +
             querystring.stringify({
-            error: 'error missing tracks'
-        }));
+                error: 'error missing tracks'
+            }));
     }
 
     let serviceY = new serviceYoutube();
     let keywords = serviceY.getAllKeywordFromSpotify(tracks)
     console.log(keywords);
     let results = await asyncForEachSearch(keywords, token, res);
-    let data = [];
+    let videos = [];
     results.forEach(r => {
         if (r && typeof r.id !== 'undefined') {
-            console.log(r.id)
-            data.push(r.id.videoId)
+            videos.push({ videoId: r.id.videoId, kind: r.id.kind })
         } else {
             console.log('error : ', r)
         }
     })
-    console.log('les datas :')
-    console.log(data);
-    
+
+    console.log('les datas :', videos)
+
+    let resultCreatePlaylist = await authorize(token, {
+        name: name,
+        isPublic: isPublic
+    }, playlistsInsert, res)
+
+    console.log("Insert result : ", resultCreatePlaylist)
+
+    let resultInsertTracks = await asyncForEachInsert(videos, resultCreatePlaylist.id)
+
     res.json({
-        items: data
+        insert: resultInsertTracks
     })
-    
 })
 
+/**
+ * 
+ * @param {object} keywords 
+ * @param {object} token 
+ * @param {object} res 
+ */
 async function asyncForEachSearch(keywords, token, res) {
     let results = []
     for (let index = 0; index < keywords.length; index++) {
-        let result = await authorize(token, {'params': {'maxResults': '1',
-        'part': 'snippet',
-        'q': keywords[index],
-        'type': 'video'}}, await searchListByKeywordV2, res)
+        let result = await authorize(token, {
+            'params': {
+                'maxResults': '1',
+                'part': 'snippet',
+                'q': keywords[index],
+                'type': 'video'
+            }
+        }, await searchListByKeywordV2, res)
 
         if (result)
             results.push(result[0]);
-        
-        if (index === keywords.length -1) {
+
+        if (index === keywords.length - 1) {
             return results
         }
     }
-  }
-  
+}
+
+async function asyncForEachInsert(videos, playlistId, token, res) {
+    let results = []
+    let serviceY = new serviceYoutube()
+    for (let index = 0; index < videos.length; index++) {
+        let params = serviceY.getDefaultInsertTracks(videos[index], playlistId)
+        let result = await authorize(token, params, await playlistsItemsInsert, res)
+
+        if (result)
+            results.push(result[0])
+
+        if (index === videos.length - 1) {
+            return results
+        }
+    }
+}
+
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
  * given callback function.
@@ -130,7 +169,7 @@ async function authorize(token, requestData, callback, res) {
     // console.log(token);
     if (!token || Date.now() > token.expiry_date) {
         console.log('token expiry or token missing')
-        res.send({
+        res.status(401).send({
             redirectUrl: apiAuthUrl,
             error: true
         });
@@ -151,33 +190,33 @@ async function getAuthUrl() {
 
 async function searchListByKeywordV2(requestData) {
     let serviceY = new serviceYoutube()
-    var parameters = serviceY.removeEmptyParameters(requestData['params']);
-    let result = await youtube.search.list(parameters);
-    return result.data.items;
+    var parameters = serviceY.removeEmptyParameters(requestData['params'])
+    let result = await youtube.search.list(parameters)
+    return result.data.items
 }
 
-function playlistsInsert(auth, requestData) {
+async function playlistsInsert(params) {
     let serviceY = new serviceYoutube()
-    var parameters = serviceY.removeEmptyParameters(requestData['params'])
-    parameters['resource'] = createResource(requestData['properties']);
-    service.playlists.insert(parameters, function(err, response) {
-      if (err) {
-        console.log('The API returned an error: ' + err);
-        return;
-      }
-      console.log(response);
-    });
-  }
+    let parameters = serviceY.getDefaultInsertPlaylist(params)
+    console.log(parameters)
+    let result = await youtube.playlists.insert(parameters)
+    return result.data
+}
+
+async function playlistsItemsInsert(params) {
+    let result = await youtube.playlistItems.insert(params)
+    return result.data
+}
 
 async function searchListByKeyword(requestData, res) {
     let serviceY = new serviceYoutube()
     var parameters = serviceY.removeEmptyParameters(requestData['params']);
-    youtube.search.list(parameters, function(err, response) {
+    youtube.search.list(parameters, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
             res.clearCookie('tokens_google')
             res.send({
-                error: true, 
+                error: true,
                 redirectUrl: apiAuthUrl
             })
             return;
