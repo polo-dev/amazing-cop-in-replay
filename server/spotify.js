@@ -74,7 +74,11 @@ router.get('/get', async function (req, res) {
     .catch(function (err) {
       console.log(err)
       res.clearCookie('access_token')
-      res.redirect('login')
+      let apiAuthUrl = req.protocol + '://' + req.headers.host + '/api/login'
+      res.status(401).send({
+        redirectUrl: apiAuthUrl,
+        error: true
+    })
       // Crawling failed...
     });
 });

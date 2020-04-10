@@ -108,10 +108,13 @@ router.post('/youtube/convert/spotify', async function (req, res) {
 
     console.log("Insert result : ", resultCreatePlaylist)
 
-    let resultInsertTracks = await asyncForEachInsert(videos, resultCreatePlaylist.id)
+    let resultInsertTracks = await asyncForEachInsert(videos, resultCreatePlaylist.id, token, res)
+
+    console.log(" result inser tracks : ", resultInsertTracks);
 
     res.json({
-        insert: resultInsertTracks
+        insert: resultInsertTracks,
+        playlist: resultCreatePlaylist
     })
 })
 
@@ -148,9 +151,10 @@ async function asyncForEachInsert(videos, playlistId, token, res) {
     for (let index = 0; index < videos.length; index++) {
         let params = serviceY.getDefaultInsertTracks(videos[index], playlistId)
         let result = await authorize(token, params, await playlistsItemsInsert, res)
-
+        
+        console.log(result);
         if (result)
-            results.push(result[0])
+            results.push(result)
 
         if (index === videos.length - 1) {
             return results

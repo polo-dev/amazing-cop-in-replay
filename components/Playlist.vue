@@ -104,7 +104,7 @@ export default {
       } else {
         let access_token = this.$store.state.access_token;
         let method = "getTracksPlaylist";
-        console.log(total)
+        console.log(total);
         let data = await axios
           .get(
             "/api/get?access_token=" +
@@ -121,20 +121,31 @@ export default {
               total
           )
           .then(response => {
-            if (typeof response.data.items.items !== 'undefined')
+            if (typeof response.data.items.items !== "undefined")
               return response.data.items.items;
             else {
-              let data = []
-              for (var i = 0; response.data.items.length > i ;i++) {
-                data.push(response.data.items[i].items)
+              let data = [];
+              for (var i = 0; response.data.items.length > i; i++) {
+                data.push(response.data.items[i].items);
               }
-              return data.flat()
+              return data.flat();
             }
           })
           .catch(error => {
             console.log(error);
+            console.log(
+              "error get tracks spotify : ",
+              error,
+              error.response.data
+            );
+            return error.response.data;
           })
           .finally();
+
+        if (data.error && data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+          return;
+        }
 
         let dateSet = {
           content: data,
@@ -165,22 +176,21 @@ export default {
           public: this.playlists[index].public
         })
         .then(response => {
-          console.log('success convert : ', response)
-          return response.data
+          console.log("success convert : ", response);
+          return response.data;
         })
         .catch(error => {
-          console.log('error convert : ', error, error.response.data)
-          return error.response.data
+          console.log("error convert : ", error, error.response.data);
+          return error.response.data;
         })
         .finally();
 
       this.finish();
 
       if (data.error && data.redirectUrl) {
-        window.location.href = data.redirectUrl
+        window.location.href = data.redirectUrl;
         return;
       }
-
     }
   }
 };

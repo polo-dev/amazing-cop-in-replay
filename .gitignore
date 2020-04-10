@@ -4,3 +4,4 @@ static/client_secret*.json
 .nuxt
 .vscode
 .test
+.idea
