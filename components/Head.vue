@@ -1,7 +1,13 @@
 <template>
-   <b-navbar toggleable="md"> 
-      <b-navbar-brand href="#" tag="h1" class="mb-0 text-center">DieAndRun</b-navbar-brand>
-   </b-navbar>
+  <v-app-bar
+    app
+    color="indigo"
+    dark
+  >
+    <v-app-bar-nav-icon @click.stop="$emit('drawer')" />
+    <v-toolbar-title>Application</v-toolbar-title>
+  </v-app-bar>
+
 </template>
 
 <style lang="scss" scoped>

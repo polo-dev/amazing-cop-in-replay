@@ -5,11 +5,11 @@ module.exports = {
   ** Headers of the page
   */
   head: {
-    title: 'template_exemple',
+    title: 'Spotify To Youtube',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Nuxt.js project' }
+      { hid: 'description', name: 'description', content: 'Un projet Nuxt.js permettant de transformer une playlist spotify en playlist youtube' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
@@ -51,7 +51,7 @@ module.exports = {
         config.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,
-          loader: 'eslint-loader',
+          // loader: 'eslint-loader',
           exclude: /(node_modules)/
         })
       }
@@ -76,10 +76,14 @@ module.exports = {
     url: 'http://localhost:3000',
     port: 3000
   },
-  modules: [
+  buildModules: [
     'cookie-universal-nuxt',
-    // Or if you have custom bootstrap CSS...
-    ['bootstrap-vue/nuxt', { css: true }],
-  ]
+    '@nuxtjs/vuetify'
+  ],
+  vuetify: {
+    icons: {
+      iconfont: 'mdiSvg'
+    }
+  }
 }
 
