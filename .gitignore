@@ -5,3 +5,4 @@ static/client_secret*.json
 .vscode
 .test
 .idea
+package-lock.json

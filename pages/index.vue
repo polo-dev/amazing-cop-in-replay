@@ -9,48 +9,7 @@
         fluid
         @click="parentDrawer = false"
       >
-        <v-row
-          align="center"
-          justify="center"
-        >
-          <v-col
-            class="text-center"
-            cols="12"
-            sm="8"
-            md="4">
-            <v-card class="elevation-12">
-              <v-toolbar
-                color="teal"
-                dark
-                flat
-              >
-                <v-toolbar-title>Login form</v-toolbar-title>
-              </v-toolbar>
-              <v-card-text>
-                <v-form>
-                  <v-text-field
-                    label="Login"
-                    name="login"
-                    prepend-icon="person"
-                    type="text"
-                  />
-
-                  <v-text-field
-                    id="password"
-                    label="Password"
-                    name="password"
-                    prepend-icon="lock"
-                    type="password"
-                  />
-                </v-form>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer/>
-                <v-btn color="primary">Login</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
+        <start v-if="currentRouteName === 'index'"></start>
       </v-container>
     </v-content>
     <app-footer/>
@@ -62,6 +21,7 @@
   import Playlist from '~/components/Playlist.vue'
   import AppFooter from '~/components/Footer.vue'
   import AppNavBar from '~/components/NavBar.vue'
+  import Start from '~/components/content/Start.vue'
   import axios from 'axios'
   import _ from 'lodash'
 
@@ -70,7 +30,8 @@
     components: {
       Playlist,
       AppFooter,
-      AppNavBar
+      AppNavBar,
+      Start
     },
     data() {
       return {
@@ -87,6 +48,9 @@
       checkStateAccesToken: function () {
         return !!(this.$store.state && this.$store.state.access_token)
       },
+      currentRouteName() {
+        return this.$route.name
+      }
     },
     watch: {
       search: function (newQuestion, oldQuestion) {

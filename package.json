@@ -29,6 +29,7 @@
     "vue-animejs": "^1.0.2"
   },
   "devDependencies": {
+    "@mdi/font": "^5.3.45",
     "@mdi/js": "^5.1.45",
     "@nuxtjs/vuetify": "^1.11.0",
     "babel-eslint": "^8.2.1",
@@ -39,6 +40,7 @@
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.7.1",
     "eslint-plugin-vue": "^4.0.0",
+    "material-design-icons-iconfont": "^5.0.1",
     "node-sass": "^4.11.0",
     "pug": "^2.0.3",
     "pug-plain-loader": "^1.0.0",

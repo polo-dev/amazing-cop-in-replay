@@ -81,9 +81,7 @@ module.exports = {
     '@nuxtjs/vuetify'
   ],
   vuetify: {
-    icons: {
-      iconfont: 'mdiSvg'
-    }
+    optionsPath: '~/plugins/vuetify.js'
   }
 }
 
