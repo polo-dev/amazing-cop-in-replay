@@ -32,7 +32,7 @@
       dark
     >
       <v-app-bar-nav-icon v-model="childDrawer" @click.stop="handleDrawer"/>
-      <v-toolbar-title>Application</v-toolbar-title>
+      <v-toolbar-title>Spotify To Youtube</v-toolbar-title>
     </v-app-bar>
   </nav>
 </template>

@@ -9,7 +9,9 @@
         fluid
         @click="parentDrawer = false"
       >
-        <start v-if="currentRouteName === 'index'"></start>
+        <start v-if="!checkStateAccesToken"/>
+        <search v-if="checkStateAccesToken" @search="handleSearchDataBack"/>
+        <playlists v-if="checkStateAccesToken" v-bind:search="search" @hasPlaylists="handleHasPlaylist"/>
       </v-container>
     </v-content>
     <app-footer/>
@@ -18,26 +20,28 @@
 
 <script>
 
-  import Playlist from '~/components/Playlist.vue'
+  import Playlists from '~/components/content/Playlists.vue'
   import AppFooter from '~/components/Footer.vue'
   import AppNavBar from '~/components/NavBar.vue'
   import Start from '~/components/content/Start.vue'
+  import Search from '~/components/content/Search.vue'
   import axios from 'axios'
   import _ from 'lodash'
 
 
   export default {
     components: {
-      Playlist,
+      Playlists,
       AppFooter,
       AppNavBar,
-      Start
+      Start,
+      Search
     },
     data() {
       return {
         search: '',
         answer: '',
-        parentDrawer: false
+        parentDrawer: false,
       }
     },
     props: {
@@ -63,28 +67,35 @@
     created: function () {
       this.debouncedGetAnswer = _.debounce(this.getSearch, 500)
     },
-    async fetch({store, params}) {
-      if (store.state.access_token) {
+    async fetch() {
+      if (this.$store.state.access_token) {
         let method = 'check_auth'
         let data = await axios
-          .get('http://localhost:3000/api/get?access_token=' + store.state.access_token + '&method=' + method)
+          .get(window.location.origin + '/api/get?access_token=' + this.$store.state.access_token + '&method=' + method)
           .catch(error => {
             console.log(error)
           })
           .finally()
         if (!data) {
-          store.state.access_token = false
-          store.commit('SET_TOKEN', false)
+          this.$store.state.access_token = false
+          this.$store.commit('SET_TOKEN', false)
         }
       } else {
-        store.state.access_token = false
-        store.commit('SET_TOKEN', false)
+        this.$store.state.access_token = false
+        this.$store.commit('SET_TOKEN', false)
       }
-
     },
     methods: {
       handleDrawerDataBack(event) {
         this.parentDrawer = event
+      },
+      handleSearchDataBack(event) {
+        this.search = event
+      },
+      handleHasPlaylist(event) {
+        if (!event) {
+          this.$store.commit('SET_TOKEN', false)
+        }
       },
       getAccessToken: function () {
         let access_token = this.$cookies.get('access_token')

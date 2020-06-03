@@ -51,7 +51,7 @@
 
 <script>
 import AppHead from '~/components/Head.vue'
-import Playlist from '~/components/Playlist.vue'
+import Playlist from '~/components/content/Playlist.vue'
 import AppFooter from '~/components/Footer.vue'
 import AppBar from '~/components/LeftBar.vue'
 import axios from 'axios'
