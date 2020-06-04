@@ -5,6 +5,8 @@
 ## Build Setup
 
 ``` bash
+# create a symbolic link from nuxt.config.dev.js to nuxt.config.js
+
 # install dependencies
 $ npm install # Or yarn install
 

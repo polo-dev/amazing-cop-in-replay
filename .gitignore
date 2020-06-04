@@ -6,3 +6,4 @@ static/client_secret*.json
 .test
 .idea
 package-lock.json
+nuxt.config.js
