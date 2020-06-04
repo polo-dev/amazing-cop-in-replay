@@ -10,7 +10,6 @@
     >
       <v-skeleton-loader
         :loading="true"
-        :transition="scale-transition"
         min-height="200"
         height="200"
         type="card"

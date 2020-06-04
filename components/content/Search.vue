@@ -9,15 +9,11 @@
       single-line
       v-model="search"
     ></v-text-field>
-
-    <v-btn icon>
-      <v-icon>mdi-dots-vertical</v-icon>
-    </v-btn>
   </v-toolbar>
 </template>
 <style lang="scss" scoped>
   .v-toolbar--floating {
-    max-width: 250px;
+    max-width: 200px;
     position: sticky;
     top: 75px;
     z-index: 100;
