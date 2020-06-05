@@ -16,7 +16,7 @@
     max-width: 200px;
     position: sticky;
     top: 75px;
-    z-index: 100;
+    z-index: 5;
   }
 </style>
 

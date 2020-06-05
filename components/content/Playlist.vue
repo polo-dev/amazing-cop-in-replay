@@ -22,7 +22,7 @@
             >
               <v-img
                 :lazy-src="'avatar/default-album.png'"
-                :src="playlist.images[0].url"
+                :src="playlist.images[1].url"
                 height="225px"
                 v-on="on"
                 v-on:click="getPlaylistTrack(playlist.id, playlist.tracks.total)"
@@ -81,7 +81,7 @@
               :key="track.track.id"
             >
               <v-list-item-avatar>
-                <v-img v-if="track.track.album.images[0]" :src="track.track.album.images[0].url"></v-img>
+                <v-img v-if="track.track.album.images[2]" :lazy-src="'avatar/default-album.png'" :src="track.track.album.images[0].url"></v-img>
                 <v-img v-else :src="'avatar/default-album.png'"></v-img>
               </v-list-item-avatar>
 
